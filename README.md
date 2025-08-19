@@ -23,5 +23,6 @@ MODELO CONCEITUAL
 ![modeloConceitual](https://github.com/user-attachments/assets/fbdb22ad-c33d-422f-91c4-ed362afaa8dc)
 
 MODELO LÓGICO
+<img width="551" height="608" alt="modelologico" src="https://github.com/user-attachments/assets/27a2ed61-eede-4dce-af18-9d468d54c49a" />
 
 
