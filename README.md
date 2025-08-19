@@ -8,4 +8,8 @@ DBSchema - Criar o ERD lógico
 BRModel - Criar o ERD conceitual
 
 📂 Estrutura do projeto
+baseDeDados - Base de dados em excel e transformada em csv
+diagramasModelos - Modelos conceitual e lógico em diagramas
+importacaoBd - Arquivo em SQL das consultas
+projMod01criacao.sql - Arquivo do Banco de dados em SQL
 
