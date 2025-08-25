@@ -127,4 +127,99 @@ WITH operacoes_concluidas AS (
 SELECT *
 FROM operacoes_concluidas
 WHERE data_base = '202501' AND estado = 'AC'
+
 ORDER BY volume_operacoes DESC
+
+----------------------------------
+-- Volume Financeiro Total: Soma de todas as operações
+SELECT
+	SUM(volume_operacoes)::MONEY AS total_movimentado
+FROM data_warehouse.fato_operacoes
+-- Número Total de Operações: Contagem de operações realizadas
+SELECT
+	SUM(numero_operacoes) AS total_operacoes
+FROM data_warehouse.fato_operacoes
+-- Ticket Médio: Volume total dividido pelo número de operações
+WITH tabela_total AS (
+	SELECT
+		SUM(numero_operacoes) AS total_operacoes,
+		SUM(volume_operacoes)::MONEY AS total_movimentado
+	FROM data_warehouse.fato_operacoes
+)
+SELECT
+	total_movimentado / total_operacoes AS ticket_medio
+FROM tabela_total
+-- Crescimento Mensal/Anual: Variação percentual do volume entre períodos
+WITH ano_agrupado AS (
+  SELECT
+    SUBSTRING(data_base::text, 1, 4)::int AS ano,
+    SUM(volume_operacoes)::numeric(18,2) AS total_movimentado
+  FROM data_warehouse.fato_operacoes
+  GROUP BY 1
+),
+comparacao AS (
+  SELECT
+    ano,
+    total_movimentado,
+    LAG(total_movimentado) OVER (ORDER BY ano) AS mov_ant
+  FROM ano_agrupado
+)
+SELECT
+  ano,
+  total_movimentado,
+  CASE
+  	WHEN mov_ant IS NULL THEN 0
+	ELSE mov_ant
+	END AS movimentado_ano_anterior,
+  CASE
+	WHEN mov_ant <> 0 THEN ROUND(((total_movimentado - mov_ant) / NULLIF(mov_ant, 0)) * 100, 2)
+	ELSE 0
+	END	AS variacao_percentual
+FROM comparacao
+ORDER BY ano;
+
+-- Concentração de Mercado: Participação dos top 5 conglomerados no volume total
+SELECT
+	cgl.nome AS conglomerado,
+	SUM(volume_operacoes)::MONEY AS total_operacoes
+FROM data_warehouse.fato_operacoes fo
+INNER JOIN data_warehouse.dim_conglomerado cgl
+	ON fo.id_conglomerado = cgl.id_conglomerado
+GROUP BY conglomerado
+ORDER BY total_operacoes DESC
+LIMIT 5
+-- Distribuição Geográfica: volume por região/estado
+SELECT
+	de.uf AS estado,
+	SUM(volume_operacoes)::MONEY AS total_estado
+FROM data_warehouse.fato_operacoes fo
+INNER JOIN data_warehouse.dim_estado de
+	ON fo.id_estado = de.id_estado
+GROUP BY estado
+ORDER BY total_estado DESC
+LIMIT 5
+-- Mix de Produtos: Distribuição por tipo de operação
+SELECT
+	dtd.tipo AS tipo,
+	SUM(volume_operacoes)::MONEY AS total_tipo
+FROM data_warehouse.fato_operacoes fo
+INNER JOIN data_warehouse.dim_tipo_desenrola dtd
+	ON fo.id_tipo_desenrola = dtd.id_tipo_desenrola
+GROUP BY tipo
+ORDER BY total_tipo
+
+-- colocando dados na tabela tipo desenrola descricao
+SELECT * FROM data_warehouse.dim_tipo_desenrola
+ORDER BY tipo
+
+UPDATE data_warehouse.dim_tipo_desenrola
+SET descricao = 'O Desenrola Brasil Faixa 1 destinava-se a pessoas com renda mensal de até dois salários mínimos ou inscritas no CadÚnico, com dívidas de até R$ 5 mil, negativadas entre 2019 e 2022.'
+WHERE tipo = '1'
+
+UPDATE data_warehouse.dim_tipo_desenrola
+SET descricao = 'Destinado a renegociar dívidas bancárias de pessoas com renda mensal de até R$ 20 mil.'
+WHERE tipo = '2'
+
+UPDATE data_warehouse.dim_tipo_desenrola
+SET descricao = 'Refere-se à renegociação de dívidas de pessoas físicas e MEIs/ME/EPP com empresas de setores como comércio, telecomunicações, educação e serviços financeiros, e foi lançado com a abertura da plataforma digital em outubro de 2023 para dívidas negativadas entre 2019 e 2022.'
+WHERE tipo = '3'
