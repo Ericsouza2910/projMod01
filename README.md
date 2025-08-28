@@ -34,7 +34,7 @@ Número Total de Operações: Contagem de operações realizadas
 
 <img width="169" height="74" alt="image" src="https://github.com/user-attachments/assets/f2f26765-8a3c-4c83-aa0b-7d77bebe6e3a" />
 
-Ticket Médio: Volume total dividido pelo número de operações
+Crescimento Mensal/Anual: Variação percentual do volume entre períodos
 
 <img width="579" height="125" alt="image" src="https://github.com/user-attachments/assets/2b97aed7-9f6d-4f36-962c-e8edf9699481" />
 
