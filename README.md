@@ -26,4 +26,8 @@ MODELO LÓGICO
 
 <img width="551" height="608" alt="modelologico" src="https://github.com/user-attachments/assets/27a2ed61-eede-4dce-af18-9d468d54c49a" />
 
+Volume Financeiro Total: Soma de todas as operações
+<img width="186" height="70" alt="image" src="https://github.com/user-attachments/assets/7ac0a587-4338-488a-a9aa-24936f23bdb9" />
+
+
 
